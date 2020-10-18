@@ -1,0 +1,42 @@
+﻿@model ShipsListViewModel
+
+@if (!Model.WindSpeedOk)
+{
+    <div class="alert alert-danger" role="alert">
+        Wind speed is not within the required range
+    </div>
+}
+@if (Model.Ships.Count == 0)
+{
+    <div class="alert alert-warning" role="alert">
+        Ships queue is empty
+    </div>
+    <div class="alert alert-info" role="alert">
+        Please click Add Ships button to add ships to the queue
+    </div>
+}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">Position</th>
+            <th scope="col">Name</th>
+            <th scope="col">Ship Type</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Ships.Count; i++)
+        {
+            var curShip = Model.Ships[i];
+            <tr>
+                <th scope="row">@curShip.Position</th>
+                <td>@curShip.Name</td>
+                <td>@curShip.ShipType</td>
+                <td>@curShip.Status</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+

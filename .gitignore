@@ -3,3 +3,15 @@
 ################################################################################
 
 /.vs/HarbourControlSystem/v16/Server/sqlite3
+/.vs/HarbourControlSystem/v16/TestStore/0
+/API/bin
+/API/obj
+/API.Repository/bin
+/API.Repository/obj
+/Domain/obj
+/FrontEnd/bin
+/FrontEnd/obj
+/FrontEndDomain/bin
+/FrontEndDomain/obj
+/Models/bin
+/Models/obj
