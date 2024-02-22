@@ -1,0 +1,120 @@
+<html><head><meta></head><body onfocusout="parent.setEmailRange();" style="overflow-wrap: break-word;">﻿
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/office-ui-fabric-core/11.0.0/css/fabric.min.css">
+    <style>
+        /* Custom table styles */
+        .custom-subgrid {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            .custom-subgrid th {
+                color: #383f42;
+                font-weight: bolder;
+                font-size: 12px;
+                font-family: SegoeUI, "Segoe UI";
+                padding: 8px;
+                text-align: left;
+                border-bottom: 1px solid #ddd; /* Add a bottom border to separate headers from data */
+                position: sticky;
+                top: 0; /* Stick the header to the top */
+                background-color: white; /* Background color of the sticky header */
+                z-index: 1; /* Ensure the header appears above the content when scrolling */
+            }
+
+            .custom-subgrid td {
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                font-family: SegoeUI, "Segoe UI";
+                font-size: 14px;
+            }
+
+            /* Remove background color from the header row */
+            .custom-subgrid thead tr {
+                background-color: transparent;
+                border-top: 1px solid #ddd;
+            }
+
+        /* Center checkboxes */
+        .checkbox-cell {
+            text-align: center;
+        }
+
+        /* Style for selected rows */
+        .selected-row {
+            background-color: #ECECEC; /* Yellow background for selected rows */
+        }
+    </style>
+    <title>Dynamics 365 Subgrid Look</title>
+    <meta>
+    <meta>
+
+
+    <table class="ms-Table custom-subgrid" id="contactList">
+        <thead>
+            <tr>
+                <th class="ms-Table-cell">Changed By</th>
+                <th class="ms-Table-cell">Operation</th>
+                <th class="ms-Table-cell">Field</th>
+                <th class="ms-Table-cell">Old Value</th>
+                <th class="ms-Table-cell">New Value</th>
+                <th class="ms-Table-cell">Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="table-rows">
+        </tbody>
+    </table>   
+
+    <script type="text/javascript">
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadContacts();
+        });
+
+        function loadContacts() {     
+            var recordId = parent.Xrm.Page.data.entity.getId().replace("{","").replace("}","");
+            var tbody = document.getElementById("table-rows");
+            var url = "https://onesource.crm.dynamics.com/api/data/v9.2/audits?$filter=objecttypecode eq 'contact' and _objectid_value eq '" + recordId + "'&$orderby=createdon desc";
+            fetch(url, {
+                method: "GET",
+                headers: {
+                    "OData-MaxVersion": "4.0",
+                    "OData-Version": "4.0",
+                    "Content-Type": "application/json; charset=utf-8",
+                    "Accept": "application/json",
+                    "Prefer": "odata.include-annotations=*"
+                }
+            }).then((response) => {
+                response.json().then((jsonData) => {
+                    var auditHistoryRecords = jsonData.value;
+                    auditHistoryRecords.forEach((auditRecord) => {
+                        var operationName = auditRecord["operation@OData.Community.Display.V1.FormattedValue"];
+                        var changeData = auditRecord["changedata"];
+                        var userName = auditRecord["_userid_value@OData.Community.Display.V1.FormattedValue"];
+                        var dateModifiedOn = auditRecord["createdon@OData.Community.Display.V1.FormattedValue"];
+
+                        var changeDataObj = JSON.parse(changeData);
+                        var changeAttributes = changeDataObj.changedAttributes;
+                        changeAttributes.forEach(x => {
+                            var newRowHTML =
+                                `<tr>                               
+                              <td class="ms-Table-cell">${userName}</td>
+                              <td class="ms-Table-cell">${operationName}</td>
+                              <td class="ms-Table-cell">${x.logicalName}</td>
+                              <td class="ms-Table-cell">${x.oldValue}</td>
+                              <td class="ms-Table-cell">${x.newValue}</td>
+                              <td class="ms-Table-cell">${dateModifiedOn}</td>
+                             </tr>`;
+                            tbody.innerHTML += newRowHTML;
+                        });                       
+
+                    })
+                })
+            });
+        }                
+
+    </script>
+
+</body></html>
